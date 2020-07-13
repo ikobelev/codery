@@ -25,7 +25,11 @@ const server = http.createServer(function (req, res) {
 function serveIndex(res) {
   initResponse(res);
   counter++;
-  res.write("Main page");
+  const html =  "<ul>" +
+                "<li><a href=\"/counter\"/>Счетчик</li>" +
+                "<li><a href=\"/reset\"/>Сброс</li>" +
+                "</ul>";
+  res.write(html);
   res.end();
 }
 
@@ -50,7 +54,7 @@ function serveNotFound(res) {
 
 function initResponse(res) {
   res.statusCode = 200;
-  res.setHeader("Content-Type", "text/plain;charset=utf-8");
+  res.setHeader("Content-Type", "text/html;charset=utf-8");
 }
 
 server.listen(port, hostname, () => {
