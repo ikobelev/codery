@@ -1,52 +1,34 @@
 // Параметры конфигурации сервера
 const hostname = '127.0.0.1';
 const port = 3000;
-const urlReset = '/reset';
-const urlCounter = '/counter';
 
 const http = require('http');
+const path = require('path');
 const url = require('url');
-
-let counter = 0;
-
-/**
- * Вспомогательный метод инициализации ответа
- */
-function initResponse(res, statusCode) {
-  res.statusCode = statusCode;
-  res.setHeader('Content-Type', 'text/html;charset=utf-8');
-}
+const fs = require('fs');
 
 /**
- * Главная страница
+ * Вывод статического контента
  */
-function serveIndex(res) {
-  initResponse(res, 200);
-  counter += 1;
-  const html = '<ul>'
-    + `<li><a href="${urlCounter}">Счетчик</li>`
-    + `<li><a href="${urlReset}"/>Сброс</li>`
-    + '</ul>';
-  res.write(html);
-  res.end();
-}
+function serveStatic(req, res, customFileName) {
+  const filename = customFileName || path.basename(req.url);
+  const extension = path.extname(filename);
 
-/**
- * Вывод страницы со счетчиком
- */
-function serveCounter(res) {
-  initResponse(res, 200);
-  res.write(`Значение счетчика: ${counter}`);
-  res.end();
-}
-
-/**
- * Сброс счетчика
- */
-function serveReset(res) {
-  initResponse(res, 200);
-  counter = 0;
-  res.write('Счетчик сброшен');
+  switch (extension) {
+    case '.html':
+      res.setHeader('Content-Type', 'text/html;charset=utf-8');
+      break;
+    case '.css':
+      res.setHeader('Content-Type', 'text/css');
+      break;
+    case '.png':
+      res.setHeader('Content-Type', 'image/png');
+      break;
+    default:
+  }
+  const content = fs.readFileSync(`static/${filename}`);
+  res.statusCode = 200;
+  res.write(content);
   res.end();
 }
 
@@ -54,25 +36,18 @@ function serveReset(res) {
  * Вывод страницы 404
  */
 function serveNotFound(res) {
-  initResponse(res, 404);
-  res.write('Not found');
+  res.statusCode = 404;
   res.end();
 }
 
 // Роутинг запроса
 const server = http.createServer((req, res) => {
-  switch (url.parse(req.url).pathname) {
-    case '/':
-      serveIndex(res);
-      break;
-    case urlReset:
-      serveReset(res);
-      break;
-    case urlCounter:
-      serveCounter(res);
-      break;
-    default:
-      serveNotFound(res);
+  if (url.parse(req.url).pathname === '/') {
+    serveStatic(req, res, 'index.html');
+  } else if (path.dirname(req.url) === '/static') {
+    serveStatic(req, res);
+  } else {
+    serveNotFound(res);
   }
 });
 
