@@ -35,7 +35,8 @@ function serveStatic(req, res, customFileName) {
   // проверяем наличие файла
   const filePath = `static/${fileName}`;
   if (!fs.existsSync(filePath)) {
-    serveNotFound();
+    serveNotFound(res);
+    return;
   }
 
   // выдаем контент файла
