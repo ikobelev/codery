@@ -29,11 +29,9 @@ function serveNotFound(res) {
 /**
  * Вывод статического контента
  */
-function serveStatic(req, res, customFileName) {
-  const fileName = customFileName || path.basename(req.url);
-
+function serveStatic(req, res, dirName, fileName) {
   // проверяем наличие файла
-  const filePath = `static/${fileName}`;
+  const filePath = `${dirName}/${fileName}`;
   if (!fs.existsSync(filePath)) {
     serveNotFound(res);
     return;
@@ -61,11 +59,11 @@ function serveStatic(req, res, customFileName) {
 const server = http.createServer((req, res) => {
   try {
     if (url.parse(req.url).pathname === '/') {
-      serveStatic(req, res, 'index.html');
-    } else if (path.dirname(req.url) === '/static') {
-      serveStatic(req, res);
+      serveStatic(req, res, 'static', 'index.html');
     } else {
-      serveNotFound(res);
+      const dirName = path.dirname(req.url).slice(1);
+      const fileName = path.basename(req.url);
+      serveStatic(req, res, dirName, fileName);
     }
   } catch (e) {
     // что-то пошло не так

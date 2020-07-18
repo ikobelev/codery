@@ -25,6 +25,12 @@ div.page-content {
   min-height: 100%;
 }
 
+div.card {
+  width: 18rem;
+  margin: 10px;
+  padding: 10px;
+}
+
 nav.nav-tabs {
   margin-bottom: 20px;
 }
