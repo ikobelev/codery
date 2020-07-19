@@ -21,24 +21,23 @@
     </header>
     <main class="row justify-content-center">
       <div class="card col-auto">
-        <img class="card-img-top img-fluid" src="/product/product1.png" alt="Card image cap">
+        <img class="card-img-top img-fluid" src="<%= products[0].img %>" alt="Card image cap">
         <div class="card-body">
-          <h5 class="card-title">ПВУ Turkov ZENIT 350 HECO</h5>
-          <p class="card-text">Вентиляционная установка в легком корпусе
-          </p>
+          <h5 class="card-title"><%= products[0].title %></h5>
+          <p class="card-text"><%= products[0].description %></p>
         </div>
         <div class="card-footer bg-transparent">
-          <a href="/product/product1.html" class="btn btn-primary">Купить</a>
+          <a href="<%= products[0].href %>" class="btn btn-primary">Купить</a>
         </div>
       </div>
       <div class="card col-auto">
-        <img class="card-img-top" src="/product/product2.jpeg" alt="Card image cap">
+        <img class="card-img-top img-fluid" src="<%= products[1].img %>" alt="Card image cap">
         <div class="card-body">
-          <h5 class="card-title">ПВУ Globalvent CLIMATE-R 300</h5>
-          <p class="card-text">Компактная и экономичная приточно-вытяжная вентиляционная установка</p>
+          <h5 class="card-title"><%= products[1].title %></h5>
+          <p class="card-text"><%= products[1].description %></p>
         </div>
         <div class="card-footer bg-transparent">
-          <a href="/product/product2.html" class="btn btn-primary">Купить</a>
+          <a href="<%= products[1].href %>" class="btn btn-primary">Купить</a>
         </div>
       </div>
     </main>

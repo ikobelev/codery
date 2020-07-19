@@ -6,6 +6,8 @@ const http = require('http');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
+const ejs = require('ejs');
+const productService = require('./ProductService.js');
 
 /**
  * Вспомогательная функция вывода заданного текстового контента
@@ -55,12 +57,24 @@ function serveStatic(req, res, dirName, fileName) {
   stream.pipe(res);
 }
 
+/**
+ * Вывод главной страницы через шаблонизатор
+ */
+function serveIndex(res) {
+  const template = ejs.compile(fs.readFileSync('static/index.html').toString());
+  res.setHeader('Content-Type', 'text/html;charset=utf-8');
+  res.write(template({ products: productService.getProducts() }));
+  res.end();
+}
+
 // Роутинг запроса
 const server = http.createServer((req, res) => {
   try {
-    if (url.parse(req.url).pathname === '/') {
-      serveStatic(req, res, 'static', 'index.html');
+    if (['/', '/static/index.html'].includes(url.parse(req.url).pathname)) {
+      // главная страница
+      serveIndex(res);
     } else {
+      // остальной контент
       const dirName = path.dirname(req.url).slice(1);
       const fileName = path.basename(req.url);
       serveStatic(req, res, dirName, fileName);
@@ -71,6 +85,9 @@ const server = http.createServer((req, res) => {
     sendContent(res, 500, 'Что-то пошло не так');
   }
 });
+
+// Инициализация подключаемых сервисов
+productService.init();
 
 // Запуск сервера
 server.listen(port, hostname, () => {
