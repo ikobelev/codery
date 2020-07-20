@@ -20,26 +20,19 @@
       </div>
     </header>
     <main class="row justify-content-center">
-      <div class="card col-auto">
-        <img class="card-img-top img-fluid" src="<%= products[0].img %>" alt="Card image cap">
-        <div class="card-body">
-          <h5 class="card-title"><%= products[0].title %></h5>
-          <p class="card-text"><%= products[0].description %></p>
+      <% for (let i=0; i < products.length; i++) { %>
+        <% let product = products[i]; %>
+        <div class="card col-auto">
+          <img class="card-img-top img-fluid" src="<%= product.img %>" alt="Card image cap">
+          <div class="card-body">
+            <h5 class="card-title"><%= product.title %></h5>
+            <p class="card-text"><%= product.description %></p>
+          </div>
+          <div class="card-footer bg-transparent">
+            <a href="<%= product.href %>" class="btn btn-primary">Купить</a>
+          </div>
         </div>
-        <div class="card-footer bg-transparent">
-          <a href="<%= products[0].href %>" class="btn btn-primary">Купить</a>
-        </div>
-      </div>
-      <div class="card col-auto">
-        <img class="card-img-top img-fluid" src="<%= products[1].img %>" alt="Card image cap">
-        <div class="card-body">
-          <h5 class="card-title"><%= products[1].title %></h5>
-          <p class="card-text"><%= products[1].description %></p>
-        </div>
-        <div class="card-footer bg-transparent">
-          <a href="<%= products[1].href %>" class="btn btn-primary">Купить</a>
-        </div>
-      </div>
+      <% } %>
     </main>
     <footer class="row">
       <div class="col-10 offset-1 col-md-8 offset-md-2">
