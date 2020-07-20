@@ -11,6 +11,9 @@ const productService = require('./ProductService.js');
 
 /**
  * Вспомогательная функция вывода заданного текстового контента
+ * @param {ServerResponse} res объект ответа
+ * @param {Number} statusCode код ответа
+ * @param {string} textContent текстовый контент для вывода
  */
 function sendContent(res, statusCode, textContent) {
   res.statusCode = statusCode;
@@ -23,6 +26,7 @@ function sendContent(res, statusCode, textContent) {
 
 /**
  * Вывод страницы 404
+ * @param {ServerResponse} res объект ответа сервера
  */
 function serveNotFound(res) {
   sendContent(res, 404, 'Страница не найдена');
@@ -30,10 +34,12 @@ function serveNotFound(res) {
 
 /**
  * Вывод статического контента
+ * @param {ServerResponse} res объект ответа сервера
+ * @param {string} fileName название статического файла
  */
-function serveStatic(req, res, dirName, fileName) {
+function serveStatic(res, fileName) {
   // проверяем наличие файла
-  const filePath = `${dirName}/${fileName}`;
+  const filePath = `static/${fileName}`;
   if (!fs.existsSync(filePath)) {
     serveNotFound(res);
     return;
@@ -59,9 +65,17 @@ function serveStatic(req, res, dirName, fileName) {
 
 /**
  * Вывод главной страницы через шаблонизатор
+ * @param {ServerResponse} res объект ответа сервера
  */
 function serveIndex(res) {
-  const template = ejs.compile(fs.readFileSync('static/index.html').toString());
+  // проверяем наличие шаблона
+  const templatePath = 'templates/index.ejs';
+  if (!fs.exists) {
+    serveNotFound(res);
+    return;
+  }
+  // выводим страницу на основе шаблона
+  const template = ejs.compile(fs.readFileSync(templatePath).toString());
   res.setHeader('Content-Type', 'text/html;charset=utf-8');
   res.write(template({ products: productService.getProducts() }));
   res.end();
@@ -70,14 +84,15 @@ function serveIndex(res) {
 // Роутинг запроса
 const server = http.createServer((req, res) => {
   try {
-    if (['/', '/static/index.html'].includes(url.parse(req.url).pathname)) {
+    if (url.parse(req.url).pathname === '/') {
       // главная страница
       serveIndex(res);
-    } else {
-      // остальной контент
-      const dirName = path.dirname(req.url).slice(1);
+    } else if (path.dirname(req.url) === '/static') {
+      // статический контент
       const fileName = path.basename(req.url);
-      serveStatic(req, res, dirName, fileName);
+      serveStatic(res, fileName);
+    } else {
+      serveNotFound(res);
     }
   } catch (e) {
     // что-то пошло не так

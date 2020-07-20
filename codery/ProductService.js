@@ -1,21 +1,27 @@
 const products = [];
 
 module.exports = {
+  /**
+   * Инициализирует список товаров
+   */
   init() {
     products.push({
       title: 'ПВУ Turkov ZENIT 350 HECO',
-      img: '/product/product1.png',
+      img: '/static/product1.png',
       description: 'Вентиляционная установка в легком корпусе',
-      href: '/product/product1.html',
+      href: '/static/product1.html',
     });
     products.push({
       title: 'ПВУ Globalvent CLIMATE-R 300',
-      img: '/product/product2.jpeg',
+      img: '/static/product2.jpeg',
       description: 'Компактная и экономичная приточно-вытяжная вентиляционная установка',
-      href: '/product/product2.html',
+      href: '/static/product2.html',
     });
   },
 
+  /**
+   * Возвращает список товаров
+   */
   getProducts() {
     return products;
   },
