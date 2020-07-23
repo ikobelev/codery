@@ -22,12 +22,11 @@
     <main class="row">
       <div class="page-content col-10 offset-1 col-md-8 offset-md-2">
         <nav class="breadcrumb">
-          <a class="breadcrumb-item" href="#">Каталог</a>
-          <a class="breadcrumb-item" href="#">Вентиляция</a>
-          <a class="breadcrumb-item" href="#">ПВУ</a>
+          <a class="breadcrumb-item" href="/">Каталог</a>
+          <a class="breadcrumb-item" href="#"><%= product.title %></a>
         </nav>
         <h3>
-          ПВУ Globalvent CLIMATE-R 300
+          <%= product.title %>
         </h3>
         <nav class="nav nav-tabs">
           <a class="nav-item nav-link active" href="#">Описание</a>
@@ -36,14 +35,12 @@
         </nav>
         <div class="row">
           <div class="col-3">
-            <img class="img-fluid" src="/static/product2.jpeg" />
+            <img class="img-fluid" src="<%= product.img %>" />
           </div>
           <div class="col-9 ">
             <div>
-              Компактная и экономичная приточно-вытяжная вентиляционная
-              установка, используемая для поддержания в помещении свежей атмосферы. Зимой во время работы отопительной
-              системы агрегат обеспечивает нагрев подаваемого вовнутрь помещения воздуха. Установка может монтироваться
-              за подвесным потолком либо в отдельной нише, то есть из помещения агрегат совершенно не виден.</div>
+              <%= product.info %>
+            </div>
             <div class="button-wrapper border-top">
               <button type="button" class="btn btn-primary">Заказать</button>
             </div>
@@ -58,5 +55,4 @@
     </footer>
   </div>
 </body>
-
 </html>

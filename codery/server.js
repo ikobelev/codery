@@ -4,7 +4,6 @@ const port = 3000;
 
 const http = require('http');
 const path = require('path');
-const url = require('url');
 const fs = require('fs');
 const ejs = require('ejs');
 const productService = require('./ProductService.js');
@@ -30,6 +29,25 @@ function sendContent(res, statusCode, textContent) {
  */
 function serveNotFound(res) {
   sendContent(res, 404, 'Страница не найдена');
+}
+
+/**
+ * Вспомогательная функция вывода страницы через шаблонизатор
+ * @param {ServerResponse} res объект ответа сервера
+ * @param {string} templatePath путь файла шаблона
+ * @param {any} scope контент для вывода
+ */
+function serveTemplate(res, templatePath, scope) {
+  // проверяем наличие шаблона
+  if (!fs.existsSync(templatePath)) {
+    serveNotFound(res);
+    return;
+  }
+  // выводим страницу на основе шаблона
+  const template = ejs.compile(fs.readFileSync(templatePath).toString());
+  res.setHeader('Content-Type', 'text/html;charset=utf-8');
+  res.write(template(scope));
+  res.end();
 }
 
 /**
@@ -68,31 +86,47 @@ function serveStatic(res, fileName) {
  * @param {ServerResponse} res объект ответа сервера
  */
 function serveIndex(res) {
-  // проверяем наличие шаблона
   const templatePath = 'templates/index.ejs';
-  if (!fs.exists) {
+  const scope = { products: productService.getProducts() };
+  serveTemplate(res, templatePath, scope);
+}
+
+/**
+ * Вывод страницы с товаром
+ * @param {ServerResponse} res объект ответа сервера
+ * @param {string} baseName идентификтор товара (id+slug)
+ */
+function serveProduct(res, baseName) {
+  const key = baseName.split('-')[0];
+  const templatePath = 'templates/product.ejs';
+  const product = productService.getProductByKey(key);
+  if (!product) {
     serveNotFound(res);
     return;
   }
-  // выводим страницу на основе шаблона
-  const template = ejs.compile(fs.readFileSync(templatePath).toString());
-  res.setHeader('Content-Type', 'text/html;charset=utf-8');
-  res.write(template({ products: productService.getProducts() }));
-  res.end();
+  serveTemplate(res, templatePath, { product });
 }
 
 // Роутинг запроса
 const server = http.createServer((req, res) => {
   try {
-    if (url.parse(req.url).pathname === '/') {
-      // главная страница
-      serveIndex(res);
-    } else if (path.dirname(req.url) === '/static') {
-      // статический контент
-      const fileName = path.basename(req.url);
-      serveStatic(res, fileName);
-    } else {
-      serveNotFound(res);
+    const dirName = path.dirname(req.url);
+    const baseName = path.basename(req.url);
+    switch (dirName) {
+      case '/':
+        // главная страница
+        serveIndex(res);
+        break;
+      case '/static':
+        // статический контент
+        serveStatic(res, baseName);
+        break;
+      case '/product':
+        //  информация о товаре
+        serveProduct(res, baseName);
+        break;
+      default:
+        serveNotFound(res);
     }
   } catch (e) {
     // что-то пошло не так
