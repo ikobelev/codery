@@ -1,6 +1,7 @@
 // Параметры конфигурации сервера
 const hostname = '127.0.0.1';
 const port = 3000;
+const mongoUri = 'mongodb://localhost:27017';
 
 const http = require('http');
 const path = require('path');
@@ -87,8 +88,10 @@ function serveStatic(res, fileName) {
  */
 function serveIndex(res) {
   const templatePath = 'templates/index.ejs';
-  const scope = { products: productService.getProducts() };
-  serveTemplate(res, templatePath, scope);
+  productService.getProducts()
+    .then((products) => {
+      serveTemplate(res, templatePath, { products });
+    });
 }
 
 /**
@@ -97,14 +100,15 @@ function serveIndex(res) {
  * @param {string} baseName идентификтор товара (id+slug)
  */
 function serveProduct(res, baseName) {
-  const key = baseName.split('-')[0];
   const templatePath = 'templates/product.ejs';
-  const product = productService.getProductByKey(key);
-  if (!product) {
-    serveNotFound(res);
-    return;
-  }
-  serveTemplate(res, templatePath, { product });
+  productService.getProductByBaseName(baseName)
+    .then((product) => {
+      if (!product) {
+        serveNotFound(res);
+      } else {
+        serveTemplate(res, templatePath, { product });
+      }
+    });
 }
 
 // Роутинг запроса
@@ -136,7 +140,7 @@ const server = http.createServer((req, res) => {
 });
 
 // Инициализация подключаемых сервисов
-productService.init();
+productService.init(mongoUri);
 
 // Запуск сервера
 server.listen(port, hostname, () => {
