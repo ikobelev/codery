@@ -25,30 +25,36 @@ function sendContent(res, statusCode, textContent) {
 }
 
 /**
- * Вывод страницы 404
- * @param {ServerResponse} res объект ответа сервера
- */
-function serveNotFound(res) {
-  sendContent(res, 404, 'Страница не найдена');
-}
-
-/**
  * Вспомогательная функция вывода страницы через шаблонизатор
  * @param {ServerResponse} res объект ответа сервера
  * @param {string} templatePath путь файла шаблона
  * @param {any} scope контент для вывода
+ * @param {number} statucCode код ответа
  */
-function serveTemplate(res, templatePath, scope) {
+function serveTemplate(res, templatePath, scope, statusCode) {
   // проверяем наличие шаблона
   if (!fs.existsSync(templatePath)) {
-    serveNotFound(res);
+    sendContent(res, 404, 'Шаблон не найден');
     return;
   }
   // выводим страницу на основе шаблона
   const template = ejs.compile(fs.readFileSync(templatePath).toString());
+  res.statusCode = statusCode || 200;
   res.setHeader('Content-Type', 'text/html;charset=utf-8');
   res.write(template(scope));
   res.end();
+}
+
+/**
+ * Вывод страницы 404
+ * @param {ServerResponse} res объект ответа сервера
+ * @param {string} customText текстовый контент для вывода
+ */
+function serveNotFound(res, customText) {
+  const scope = {
+    textContent: customText || 'Введенная вами страница на сайте не обнаружена',
+  };
+  serveTemplate(res, 'templates/404.ejs', scope, 404);
 }
 
 /**
@@ -97,14 +103,14 @@ function serveIndex(res) {
 /**
  * Вывод страницы с товаром
  * @param {ServerResponse} res объект ответа сервера
- * @param {string} baseName идентификтор товара (id+slug)
+ * @param {string} baseName идентификтор товара (key+slug)
  */
 function serveProduct(res, baseName) {
   const templatePath = 'templates/product.ejs';
   productService.getProductByBaseName(baseName)
     .then((product) => {
       if (!product) {
-        serveNotFound(res);
+        serveNotFound(res, 'Введенный вами товар не найден');
       } else {
         serveTemplate(res, templatePath, { product });
       }
@@ -116,21 +122,17 @@ const server = http.createServer((req, res) => {
   try {
     const dirName = path.dirname(req.url);
     const baseName = path.basename(req.url);
-    switch (dirName) {
-      case '/':
-        // главная страница
-        serveIndex(res);
-        break;
-      case '/static':
-        // статический контент
-        serveStatic(res, baseName);
-        break;
-      case '/product':
-        //  информация о товаре
-        serveProduct(res, baseName);
-        break;
-      default:
-        serveNotFound(res);
+    if (req.url === '/') {
+      // главная страница
+      serveIndex(res);
+    } else if (dirName === '/static') {
+      // статический контент
+      serveStatic(res, baseName);
+    } else if (dirName === '/product') {
+      //  информация о товаре
+      serveProduct(res, baseName);
+    } else {
+      serveNotFound(res);
     }
   } catch (e) {
     // что-то пошло не так

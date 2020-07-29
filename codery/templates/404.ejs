@@ -19,20 +19,10 @@
         </nav>
       </div>
     </header>
-    <main class="row justify-content-center">
-      <% for (let i=0; i < products.length; i++) { %>
-        <% let product = products[i]; %>
-        <div class="card col-auto">
-          <img class="card-img-top img-fluid" src="<%= product.img %>" alt="Card image cap">
-          <div class="card-body">
-            <h5 class="card-title"><%= product.title %></h5>
-            <p class="card-text"><%= product.description %></p>
-          </div>
-          <div class="card-footer bg-transparent">
-            <a href="/product/<%= product.baseName %>" class="btn btn-primary">Купить</a>
-          </div>
-        </div>
-      <% } %>
+    <main class="row">
+      <div class="page-content col-10 offset-1 col-md-8 offset-md-2">
+        <h3><%= textContent %></h3>
+      </div>
     </main>
     <footer class="row">
       <div class="col-10 offset-1 col-md-8 offset-md-2">
