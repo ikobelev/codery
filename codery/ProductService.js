@@ -7,8 +7,8 @@ module.exports = {
   /**
    * Инициализирует список товаров
    */
-  init(mongoUri) {
-    mongoClient.connect(mongoUri)
+  init(mongoUrl) {
+    mongoClient.connect(mongoUrl)
       .then((clientInstance) => {
         shopDatabase = clientInstance.db('shop');
         productCollection = shopDatabase.collection('product');
@@ -37,12 +37,9 @@ module.exports = {
    * @param {string} baseName идентификатор товара в формате {key}-{slug}
    */
   getProductByBaseName(baseName) {
-    return new Promise((resove, reject) => {
-      this.getProducts().then((products) => {
-        const product = products.find((x) => x.baseName === baseName);
-        resove(product);
-      });
-    });
+    // извлекаем ключ товара из идентификатора
+    const key = baseName.split('-')[0];
+    return productCollection.findOne({ key });
   },
 
 };

@@ -1,7 +1,7 @@
 // Параметры конфигурации сервера
 const hostname = '127.0.0.1';
 const port = 3000;
-const mongoUri = 'mongodb://localhost:27017';
+const mongoUrl = 'mongodb://localhost:27017';
 
 const http = require('http');
 const path = require('path');
@@ -140,7 +140,7 @@ const server = http.createServer((req, res) => {
 });
 
 // Инициализация подключаемых сервисов
-productService.init(mongoUri);
+productService.init(mongoUrl);
 
 // Запуск сервера
 server.listen(port, hostname, () => {
