@@ -33,13 +33,22 @@ module.exports = {
   },
 
   /**
-   * Возвращает промис товара по идентификатору
-   * @param {string} baseName идентификатор товара в формате {key}-{slug}
+   * Возвращает промис товара по ключу
+   * @param {string} key ключ товара
    */
-  getProductByBaseName(baseName) {
-    // извлекаем ключ товара из идентификатора
-    const key = baseName.split('-')[0];
+  getProductByKey(key) {
     return productCollection.findOne({ key });
+  },
+
+  /**
+   * Парсит идентификтор товара.
+   * Возращает объект, содержащий ключ и slug товара
+   * @param {*} идентификатор товара в формате {key}-{slug}
+   */
+  parseProductBaseName(baseName) {
+    const key = baseName.split('-')[0];
+    const slug = baseName.slice(key.length + 1);
+    return { key, slug };
   },
 
 };

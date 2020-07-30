@@ -101,16 +101,32 @@ function serveIndex(res) {
 }
 
 /**
+ * Выполняет редирект на указанную страницу
+ * @param {ServerResponse} res объект ответа сервера
+ * @param {string} targetUrl целевая страница перенаправления
+ */
+function redirectTo(res, targetUrl) {
+  res.statusCode = 301;
+  res.setHeader('Location', targetUrl);
+  res.end();
+}
+
+/**
  * Вывод страницы с товаром
  * @param {ServerResponse} res объект ответа сервера
  * @param {string} baseName идентификтор товара (key+slug)
  */
 function serveProduct(res, baseName) {
   const templatePath = 'templates/product.ejs';
-  productService.getProductByBaseName(baseName)
+  const parsedId = productService.parseProductBaseName(baseName);
+  productService.getProductByKey(parsedId.key)
     .then((product) => {
       if (!product) {
+        // товар по ключу не найден
         serveNotFound(res, 'Введенный вами товар не найден');
+      } else if (product.slug !== parsedId.slug) {
+        // товар по ключу найден, но slug не совпадает
+        redirectTo(res, `/product/${product.key}-${product.slug}`);
       } else {
         serveTemplate(res, templatePath, { product });
       }
