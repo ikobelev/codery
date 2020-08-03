@@ -64,7 +64,7 @@ function serveNotFound(res, customText) {
  */
 function serveStatic(res, fileName) {
   // проверяем наличие файла
-  const filePath = `static/${fileName}`;
+  const filePath = `public/${fileName}`;
   if (!fs.existsSync(filePath)) {
     serveNotFound(res);
     return;
