@@ -133,6 +133,24 @@ function serveProduct(res, baseName) {
     });
 }
 
+/**
+ * Вывод страницы SPA
+ * @param {ServerResponse} res объект ответа сервера
+ */
+function serveSpa(res) {
+  // проверяем наличие файла
+  const filePath = 'public/spa.html';
+  if (!fs.existsSync(filePath)) {
+    serveNotFound(res);
+    return;
+  }
+
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/html;charset=utf-8');
+  const stream = fs.createReadStream(filePath);
+  stream.pipe(res);
+}
+
 // Роутинг запроса
 const server = http.createServer((req, res) => {
   try {
@@ -140,13 +158,13 @@ const server = http.createServer((req, res) => {
     const baseName = path.basename(req.url);
     if (req.url === '/') {
       // главная страница
-      serveIndex(res);
+      serveSpa(res);
     } else if (dirName === '/static') {
       // статический контент
       serveStatic(res, baseName);
     } else if (dirName === '/product') {
       //  информация о товаре
-      serveProduct(res, baseName);
+      serveSpa(res, baseName);
     } else {
       serveNotFound(res);
     }
