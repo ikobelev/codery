@@ -124,9 +124,9 @@ function serveProduct(res, baseName) {
       if (!product) {
         // товар по ключу не найден
         serveNotFound(res, 'Введенный вами товар не найден');
-      } else if (product.slug !== parsedId.slug) {
-        // товар по ключу найден, но slug не совпадает
-        redirectTo(res, `/product/${product.key}-${product.slug}`);
+      } else if (product.baseName !== baseName) {
+        // товар по ключу найден, но идентификатор (key+slug) не совпадает
+        redirectTo(res, `/product/${product.baseName}`);
       } else {
         serveTemplate(res, templatePath, { product });
       }

@@ -19,17 +19,17 @@ module.exports = {
    * Возвращает промис списка товаров
    */
   getProducts() {
-    return new Promise(((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const cursor = productCollection.find();
       cursor.toArray()
         .then((products) => {
           products.forEach((p) => {
             // добавляем поле идентификтора товара в формате {key}-{slug}
-            p.baseName = `${p.key}-${p.slug}`;
+            this.postInitProduct(p);
           });
           resolve(products);
         });
-    }));
+    });
   },
 
   /**
@@ -37,18 +37,36 @@ module.exports = {
    * @param {string} key ключ товара
    */
   getProductByKey(key) {
-    return productCollection.findOne({ key });
+    return new Promise((resolve, reject) => {
+      productCollection.findOne({ key })
+        .then((product) => {
+          // добавляем поле идентификтора товара в формате {key}-{slug}
+          this.postInitProduct(product);
+          resolve(product);
+        });
+    });
   },
 
   /**
    * Парсит идентификтор товара.
    * Возращает объект, содержащий ключ и slug товара
-   * @param {*} идентификатор товара в формате {key}-{slug}
+   * @param {string} идентификатор товара в формате {key}-{slug}
    */
   parseProductBaseName(baseName) {
     const key = baseName.split('-')[0];
     const slug = baseName.slice(key.length + 1);
     return { key, slug };
+  },
+
+  /**
+   * Выполняет пост-инициализацию объекта товара:
+   * добавляет идентификатор товара в формате {key}-{slug}
+   * @param {*} product - объект товара
+   */
+  postInitProduct(product) {
+    if (product) {
+      product.baseName = `${product.key}-${product.slug}`;
+    }
   },
 
 };
